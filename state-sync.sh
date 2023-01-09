@@ -1,15 +1,16 @@
 # config
-SERVICE=rizond
-COSMOS=rizond
-CONFIG=/root/.rizon/config/
-HOME_DIR=/root/.rizon/
-SNAP_RPC="89.111.15.146:11421"
+SERVICE="rizond"
+COSMOS="rizond"
+CONFIG="/root/.rizon/config/"
+HOME_DIR="/root/.rizon/"
+SNAP_RPC="http://rpc:port"
+PRUNING=100
 
 # logic
-LATEST_HEIGHT=$(curl -s $SNAP_RPC/block | jq -r .result.block.header.height) && \
-BLOCK_HEIGHT=$((LATEST_HEIGHT - 100)) && \
-TRUST_HASH=$(curl -s "$SNAP_RPC/block?height=$BLOCK_HEIGHT" | jq -r .result.block_id.hash)
-RPC_RESULT=$(echo $LATEST_HEIGHT $BLOCK_HEIGHT $TRUST_HASH | grep "[0-9]* [0-9]* [A-Z0-9]*")
+LATEST_HEIGHT=$(curl -s ${SNAP_RPC}/block | jq -r ".result.block.header.height") && \
+BLOCK_HEIGHT=$((LATEST_HEIGHT - PRUNING)) && \
+TRUST_HASH=$(curl -s "${SNAP_RPC}/block?height=${BLOCK_HEIGHT}" | jq -r ".result.block_id.hash") && \
+RPC_RESULT=$(echo ${LATEST_HEIGHT} ${BLOCK_HEIGHT} ${TRUST_HASH} | grep "[0-9]* [0-9]* [A-Z0-9]*")
 
 if [[ ${RPC_RESULT} != "" ]]; then
     clear && \
@@ -30,7 +31,7 @@ if [[ ${RPC_RESULT} != "" ]]; then
     echo "INFO: config has been edited." && \
 
     sudo systemctl restart ${SERVICE} && \
-    echo "INFO: service has been restarted. input any value to see logs: " && \
+    echo "INFO: service has been restarted. input any value to open logs: " && \
     read foo && \
 
     journalctl -fu ${SERVICE} -o cat
