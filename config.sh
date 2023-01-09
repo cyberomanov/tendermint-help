@@ -1,6 +1,8 @@
 # config
-COSMOS="gravity" && \
+COSMOS="gravity"
 ID="11"
+SNAPSHOT_INTERVAL=100
+SNAPSHOT_KEEP_RECENT=2
 
 # logic
 sed -i.bak -e "\
@@ -12,8 +14,8 @@ s%^external_address = \"\"%external_address = \"`echo $(hostname -I | awk '{prin
 s%^prometheus_listen_addr = \":26660\"%prometheus_listen_addr = \":11${ID}5\"%" $HOME/.${COSMOS}/config/config.toml
 
 sed -i.bak -e "s/^indexer *=.*/indexer = \"kv\"/" $HOME/.${COSMOS}/config/config.toml
-sed -i.bak -e "s/^snapshot-interval *=.*/snapshot-interval = \"100\"/" $HOME/.${COSMOS}/config/app.toml
-sed -i.bak -e "s/^snapshot-keep-recent *=.*/snapshot-keep-recent = \"2\"/" $HOME/.${COSMOS}/config/app.toml
+sed -i.bak -e "s/^snapshot-interval *=.*/snapshot-interval = \"${SNAPSHOT_INTERVAL}\"/" $HOME/.${COSMOS}/config/app.toml
+sed -i.bak -e "s/^snapshot-keep-recent *=.*/snapshot-keep-recent = \"${SNAPSHOT_KEEP_RECENT}\"/" $HOME/.${COSMOS}/config/app.toml
 
 sed -i -e "s/^filter_peers *=.*/filter_peers = \"true\"/" $HOME/.${COSMOS}/config/config.toml
 sed -i 's/max_num_inbound_peers =.*/max_num_inbound_peers = 100/g' $HOME/.${COSMOS}/config/config.toml
