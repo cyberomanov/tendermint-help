@@ -5,6 +5,7 @@ CONFIG="/root/.rizon/config/"
 HOME_DIR="/root/.rizon/"
 SNAP_RPC="http://rpc:port"
 PRUNING=100
+PEERS=""
 
 # logic
 LATEST_HEIGHT=$(curl -s ${SNAP_RPC}/block | jq -r ".result.block.header.height") && \
@@ -28,6 +29,8 @@ if [[ ${RPC_RESULT} != "" ]]; then
     s|^(trust_height[[:space:]]+=[[:space:]]+).*$|\1$BLOCK_HEIGHT| ; \
     s|^(trust_hash[[:space:]]+=[[:space:]]+).*$|\1\"$TRUST_HASH\"| ; \
     s|^(seeds[[:space:]]+=[[:space:]]+).*$|\1\"\"|" ${CONFIG}/config.toml  && \
+    sed -i.bak -e  "s/^persistent_peers *=.*/persistent_peers = \"${PEERS}\"/" ${CONFIG}/config.toml
+    
     echo "INFO: config has been edited." && \
 
     sudo systemctl restart ${SERVICE} && \
@@ -39,3 +42,5 @@ else
     clear && \
     echo -e "\nERROR: RPC is NOT OK.\n"
 fi
+
+# sed -i.bak -E "s|^(enable[[:space:]]+=[[:space:]]+).*$|\1false|" ${CONFIG}/config.toml && sudo systemctl restart ${SERVICE} && journalctl -u ${SERVICE} -f -o cat
